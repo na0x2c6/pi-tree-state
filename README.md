@@ -82,11 +82,16 @@ Load such an extension after this one. pi runs them in that order and keeps the 
 npm install
 npm run check
 npm test
-node test/e2e/run.ts [model]
-E2E_TOOLS=1 node test/e2e/repos.ts [model]
 ```
 
-`LLAMA_URL` selects the server, and `E2E_EXTENSIONS` loads more extensions, separated by `:`.
+The e2e runs drive a real session against an OpenAI-compatible server, such as llama.cpp's `llama-server`, at `http://127.0.0.1:8081` unless `LLAMA_URL` says otherwise. `E2E_TOOLS=1` gives the model its tools, and `E2E_EXTENSIONS` loads more extensions, separated by `:`.
+
+```bash
+node test/e2e/run.ts [model]
+LLAMA_URL=http://127.0.0.1:8080 node test/e2e/run.ts [model]
+E2E_TOOLS=1 node test/e2e/repos.ts [model]
+E2E_EXTENSIONS=../summary.ts node test/e2e/run.ts [model]
+```
 
 ## License
 
