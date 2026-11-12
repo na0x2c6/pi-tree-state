@@ -16,6 +16,12 @@ To try it for one session without installing:
 pi -e npm:pi-tree-state
 ```
 
+Or install it from GitHub, pinned to a release tag:
+
+```bash
+pi install git:github.com/na0x2c6/pi-tree-state@v0.1.0
+```
+
 ## Code
 
 A snapshot is taken when a user message arrives and after every turn, unless the code is what the path already leads to. It has the shape of `git stash push -u`: a commit of the worktree whose parents are HEAD, a commit of the index and, when there are any, a commit of the untracked files. The stash list and the index stay untouched.
