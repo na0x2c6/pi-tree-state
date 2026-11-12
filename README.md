@@ -7,7 +7,13 @@ It needs only a git repository, and works with any model.
 ## Install
 
 ```bash
-pi -e ./extensions/tree-state.ts
+pi install npm:pi-tree-state
+```
+
+To try it for one session without installing:
+
+```bash
+pi -e npm:pi-tree-state
 ```
 
 ## Code

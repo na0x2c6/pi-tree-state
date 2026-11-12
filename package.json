@@ -3,10 +3,28 @@
   "version": "0.1.0",
   "description": "Pi extension that keeps the code of each point of the session tree",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/na0x2c6/pi-tree-state.git"
+  },
+  "homepage": "https://github.com/na0x2c6/pi-tree-state#readme",
+  "bugs": {
+    "url": "https://github.com/na0x2c6/pi-tree-state/issues"
+  },
   "type": "module",
-  "keywords": ["pi-package"],
+  "keywords": [
+    "pi-package",
+    "pi-extension",
+    "git"
+  ],
+  "files": [
+    "extensions",
+    "src"
+  ],
   "pi": {
-    "extensions": ["./extensions/tree-state.ts"]
+    "extensions": [
+      "./extensions/tree-state.ts"
+    ]
   },
   "scripts": {
     "check": "tsc --noEmit",
