@@ -61,6 +61,17 @@ A restore makes the worktree match exactly, removing files added since. HEAD doe
 
 `/fork` asks the same.
 
+## /code-restore
+
+Brings back the code of a point while the conversation stays where it is, the same as going there with a restore and coming back with "Keep current code". It lists each user message, for the code it was sent with, and the end of each branch, for the code the branch was left with, newest first. `*` marks the current branch.
+
+```text
+/code-restore              # choose from the list
+/code-restore 3f9a2c1e     # the entry with this id, or a prefix of it
+```
+
+It asks for the worktree or the worktree and index, as `/tree` does, and `/code-undo` goes back. The restored code is recorded at the next message, under that message, so the point it came from keeps its own snapshot.
+
 When "Summarize" was chosen too, the summary ends by saying whether the changes of that branch are still in the files, which the summary could not know otherwise. An extension that writes the summary itself gets that sentence from `tree-state:code-note` on `pi.events`.
 
 Load such an extension after this one. pi runs them in that order and keeps the last result: the other way round the dialog comes after the summary, the sentence is missing from it, and what this extension returns for pi's summary replaces it.

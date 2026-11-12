@@ -8,6 +8,7 @@ import { getAgentDir } from "@earendil-works/pi-coding-agent";
 import { homedir } from "node:os";
 import { join, resolve } from "node:path";
 import type { RestoreMode } from "../src/checkpoint.ts";
+import { entryByPrefix, restorePoints } from "../src/points.ts";
 import { ancestorSessions } from "../src/storage.ts";
 import { type PlannedRestore, Workspace } from "../src/workspace.ts";
 
@@ -45,9 +46,14 @@ export default function (pi: ExtensionAPI) {
 
   // Asks what to do with the code of a point. Undefined means leave it, and
   // "cancel" that the user backed out.
-  const askRestore = async (ctx: ExtensionContext, repos: number): Promise<RestoreMode | "cancel" | undefined> => {
+  const askRestore = async (
+    ctx: ExtensionContext,
+    repos: number,
+    canKeep = true,
+  ): Promise<RestoreMode | "cancel" | undefined> => {
     const title = repos > 1 ? `Restore code in ${repos} repositories?` : "Restore code?";
-    const choice = await ctx.ui.select(title, [KEEP, RESTORE_WORKTREE, RESTORE_BOTH, CANCEL]);
+    const choices = canKeep ? [KEEP, RESTORE_WORKTREE, RESTORE_BOTH, CANCEL] : [RESTORE_WORKTREE, RESTORE_BOTH, CANCEL];
+    const choice = await ctx.ui.select(title, choices);
     if (choice === RESTORE_WORKTREE) return "worktree";
     if (choice === RESTORE_BOTH) return "worktree+index";
     return choice === KEEP ? undefined : "cancel";
@@ -131,6 +137,33 @@ export default function (pi: ExtensionAPI) {
     handler: async (_args, ctx) => {
       const done = await workspace?.undo();
       ctx.ui.notify(done ? "code back to before the last restore" : "no restore to undo", "info");
+    },
+  });
+
+  // Leaves the conversation where it is: the same as going to the point with a
+  // restore and coming back with the code kept, in one step.
+  pi.registerCommand("code-restore", {
+    description: "Restore the code of a point of the session, without moving the conversation",
+    handler: async (args, ctx) => {
+      const entries = ctx.sessionManager.getEntries();
+      let id: string | undefined;
+      const prefix = args.trim();
+      if (prefix) {
+        const entry = entryByPrefix(entries, prefix);
+        if (typeof entry === "string") return ctx.ui.notify(entry, "error");
+        id = entry.id;
+      } else {
+        const points = restorePoints(entries, new Set(pathTo(ctx, ctx.sessionManager.getLeafId())));
+        if (points.length === 0) return ctx.ui.notify("no point to restore", "info");
+        const choice = await ctx.ui.select("Restore the code of which point? (* this branch)", points.map((p) => p.title));
+        id = points.find((point) => point.title === choice)?.id;
+        if (!id) return;
+      }
+
+      const planned = (await workspace?.plan(pathTo(ctx, id))) ?? [];
+      if (planned.length === 0) return ctx.ui.notify("the code is already that of the point", "info");
+      const mode = await askRestore(ctx, planned.length, false);
+      if (mode && mode !== "cancel") await applyRestore(ctx, planned, mode);
     },
   });
 
