@@ -2,7 +2,7 @@
 
 A [pi](https://github.com/earendil-works/pi) extension that keeps a snapshot of the code for each point of the session tree, and brings it back when `/tree` moves there.
 
-It needs only a git repository, and works with any model.
+It only covers what git can see: files inside a git repository that are not ignored. Files outside a repository, or ignored by `.gitignore`, keep whatever state they are in when `/tree` moves.
 
 ## Install
 
